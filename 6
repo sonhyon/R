@@ -1,0 +1,17 @@
+students <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Helen", "Ian"),
+  class = c(1, 1, 1, 2, 2, 2, 3, 3, 3),
+  math = c(90, 85, 88, 60, 95, 50, 77, 79, 78),
+  english = c(92, 86, 90, 62, 96, 52, 75, 78, 77),
+  korean = c(91, 84, 89, 65, 94, 55, 74, 79, 78),
+  attendance_rate = c(95, 90, 88, 80, 93, 85, 70, 77, 85)
+)
+
+#Q.  과목별 평균 점수(math, english, korean)와 출석률(attendance_rate)을 고려해서 '종합 점수'를 만들고, 이를 기준으로 각 반(class)별 상위 30% 학생들의 이름과 종합 점수를 출력하세요.
+students %>%
+  mutate(total_score = (math + english + korean) / 3 * 0.7 + attendance_rate * 0.3) %>%
+  group_by(class) %>%
+  mutate(cutoff = quantile(total_score, 0.7)) %>%
+  filter(total_score >= cutoff) %>%
+  select(class, name, total_score) %>%
+  arrange(class, desc(total_score))
