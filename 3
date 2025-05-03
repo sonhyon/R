@@ -1,0 +1,17 @@
+orders <- data.frame(
+  order_id = 1:10,
+  customer = c("Alice", "Bob", "Alice", "Charlie", "Bob", "Alice", "Charlie", "David", "David", "Alice"),
+  order_date = as.Date(c(
+    "2023-03-02", "2023-03-15", "2023-04-01", "2023-03-20", "2023-04-05",
+    "2023-03-10", "2023-04-20", "2023-03-12", "2023-04-18", "2023-04-25"
+  )),
+  amount = c(100, 150, 120, 80, 200, 130, 90, 160, 110, 140)
+)
+
+#Q. 결측값을 포함한 상태에서 평균 점수를 계산할 때, 결측값을 무시하고 계산하는 함수를 작성하세요.
+evaluate_students <- function(students) {
+  students$avg <- rowMeans(students[, 2:4], na.rm = TRUE)  # NA 무시하고 평균 계산
+  students$remark <- ifelse(students$avg >= 70, "Good", "Needs Improvement")
+  return(students)
+}
+result <- evaluate_students(students)
