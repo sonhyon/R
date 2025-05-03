@@ -1,0 +1,17 @@
+students <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Helen", "Ian"),
+  class = c(1, 1, 1, 2, 2, 2, 3, 3, 3),
+  math = c(90, NA, 88, 60, 95, 50, 77, 79, NA),
+  english = c(92, 86, NA, 62, 96, 52, 75, 78, 77),
+  korean = c(91, 84, 89, 65, 94, 55, NA, 79, 78)
+)
+
+#Q. 결측값을 제외하고 각 학생의 평균 점수를 계산한 뒤, 반(class)별로 평균 점수가 가장 높은 학생의 이름(name)과 평균 점수(avg)를 출력하세요.
+#단, 평균 점수는 math, english, korean 3과목 중 2과목 이상 점수가 있는 경우에만 계산합니다.
+students %>%
+  mutate(
+    valid_count = rowSums(!is.na(across(math:korean))),
+    avg = ifelse(valid_count >= 2, rowMeans(across(math:korean), na.rm = TRUE), NA)) %>%
+  group_by(class) %>%
+  filter(avg == max(avg, na.rm = TRUE)) %>%
+  select(class, name, avg)
