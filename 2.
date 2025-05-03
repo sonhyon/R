@@ -1,0 +1,12 @@
+orders <- data.frame(
+  order_id = 1:8,
+  customer = c("Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Helen"),
+  order_date = as.Date(c("2023-03-02", "2023-03-15", "2023-02-28", "2023-03-20",
+                         "2023-03-31", "2023-04-01", "2023-03-10", "2023-03-05")),
+  amount = c(100, 200, 180, 90, 150, 170, 160, 120)
+)
+
+#Q. 3월에 주문한 고객 중, 주문 금액이 150 이상인 주문을 모두 출력하세요.
+orders[orders$order_date >= as.Date("2023-03-01") &
+         orders$order_date <= as.Date("2023-03-31") &
+         orders$amount >= 150, ]
