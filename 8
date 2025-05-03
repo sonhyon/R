@@ -1,0 +1,12 @@
+st_math <- data.frame(
+  class = c(1, 2, 3),
+  avg_math = c(85, 90, 78)
+)
+
+#Q. 문제 1: 반(class)별 평균 수학 점수 막대 그래프
+ggplot(st_math, aes(x = factor(class), y = avg_math)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "반별 평균 수학 점수",
+       x = "반",
+       y = "평균 수학 점수") +
+  theme_minimal()
