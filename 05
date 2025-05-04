@@ -7,18 +7,14 @@ students <- data.frame(
 )
 
 #Q. students 데이터프레임에서 과목별 점수의 표준편차가 10 이하인 반(class)만 추려서, 이 반(class)별 평균 영어 점수(english 평균)를 구하세요.
-std_dev <- students %>%
+sd_class <- students %>%
   group_by(class) %>%
   summarise(
-    math_sd = sd(math),
-    english_sd = sd(english),
-    korean_sd = sd(korean)
-  )
-valid_classes <- std_dev %>%
-  filter(math_sd <= 10, english_sd <= 10, korean_sd <= 10) %>%
-  pull(class)
-
-result <- students %>%
-  filter(class %in% valid_classes) %>%
-  group_by(class) %>%
-  summarise(avg_english = mean(english))
+    sd_math = sd(math),
+    sd_english = sd(english),
+    sd_korean = sd(korean)
+  ) %>%
+  filter(sd_math <= 10, sd_english <= 10, sd_korean <= 10) %>%  # 표준편차가 10 이하인 반만 필터링
+  left_join(students, by = "class") %>%  # 필터링된 반에 대해 다시 원본 데이터와 결합
+  group_by(class) %>%  
+  summarise(avg_english = mean(english))  # 평균 영어 점수 계산
