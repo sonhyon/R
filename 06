@@ -11,7 +11,7 @@ students <- data.frame(
 students %>%
   mutate(total_score = (math+english+korean+attendance_rate)/4) %>%
   group_by(class) %>%
-  mutate(cutoff = quantile(total_score, 0.7)) %>%
+  mutate(cutoff = quantile(total_score, 0.7)) %>% #mutate를 두 번 썼다는 게 포인트
   filter(total_score >= cutoff) %>%
   select(class, name, total_score)
   
