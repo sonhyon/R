@@ -1,0 +1,109 @@
+#Q. 3월에 주문한 고객 중, 주문 금액이 150 이상인 주문을 모두 출력하세요.
+orders[orders$order_date >= as.Date("2023-03-01") &
+         orders$order_date <= as.Date("2023-03-31") &
+         orders$amount >= 150, ]
+
+#Q. 결측값을 포함한 상태에서 평균 점수를 계산할 때, 결측값을 무시하고 계산하는 함수를 작성하세요.
+evaluate_students <- function(students) {
+  students$avg <- rowMeans(students[, 2:4], na.rm = TRUE)  # NA 무시하고 평균 계산
+  students$remark <- ifelse(students$avg >= 70, "Good", "Needs Improvement")
+  return(students)
+}
+result <- evaluate_students(students)
+
+#Q. 다음 조건을 모두 만족하는 학생의 이름과 반(class)을 출력하세요
+total <- merge(students, attendance, by = "name")
+total %>%
+  mutate(avg = rowMeans(select(., math, english, korean))) %>% #select(., math, english, korean)) : 앞에서 넘겨받은 데이터프레임에서 math, english, korean 열만 선택하라."
+  filter(math >= 80, rate >= 90, avg >= 85) %>%
+  select(name, class)
+
+#Q. students 데이터프레임에서 과목별 점수의 표준편차가 10 이하인 반(class)만 추려서, 이 반(class)별 평균 영어 점수(english 평균)를 구하세요.
+std_dev <- students %>%
+  group_by(class) %>%
+  summarise(
+    math_sd = sd(math),
+    english_sd = sd(english),
+    korean_sd = sd(korean)
+  )
+valid_classes <- std_dev %>%
+  filter(math_sd <= 10, english_sd <= 10, korean_sd <= 10) %>%
+  pull(class)
+
+result <- students %>%
+  filter(class %in% valid_classes) %>%
+  group_by(class) %>%
+  summarise(avg_english = mean(english))
+
+#Q.  과목별 평균 점수(math, english, korean)와 출석률(attendance_rate)을 고려해서 '종합 점수'를 만들고, 이를 기준으로 각 반(class)별 상위 30% 학생들의 이름과 종합 점수를 출력하세요.
+students %>%
+  mutate(total_score = (math + english + korean) / 3 * 0.7 + attendance_rate * 0.3) %>%
+  group_by(class) %>%
+  mutate(cutoff = quantile(total_score, 0.7)) %>%
+  filter(total_score >= cutoff) %>%
+  select(class, name, total_score) %>%
+  arrange(class, desc(total_score))
+
+#Q. 학생별로 과목별 평균 점수를 계산한다. class별로 과목 평균 점수가 가장 높은 학생(1등)만 출력하라.
+students %>%
+  mutate(avg = rowMeans(across(math:korean))) %>%
+  group_by(class) %>%
+  filter(avg == max(avg)) %>%
+  ungroup() %>% # 그룹 해제(dplyr은 group_by가 남아 있으면 grouped tibble 형태로 보여줘서, 정렬과 상관없이 그룹별로 보여줌)
+  select(class, name, avg) %>%
+  arrange(class) # 이제 확실히 class 오름차순 정렬
+
+#Q. 문제 1: 반(class)별 평균 수학 점수 막대 그래프
+ggplot(st_math, aes(x = factor(class), y = avg_math)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "반별 평균 수학 점수",
+       x = "반",
+       y = "평균 수학 점수") +
+  theme_minimal()
+
+#Q. 각 과목의 평균 점수를 구한 후, 이를 막대 그래프로 시각화하세요.
+subject_avg <- data.frame(
+  subject = c("math", "english", "korean"),
+  average = colMeans(students[, c("math", "english", "korean")])
+)
+ggplot(subject_avg, aes(x = subject, y = average)) +
+  geom_bar(stat = "identity") 
+
+#Q. 결측값을 제외하고 각 학생의 평균 점수를 계산한 뒤, 반(class)별로 평균 점수가 가장 높은 학생의 이름(name)과 평균 점수(avg)를 출력하세요.
+#단, 평균 점수는 math, english, korean 3과목 중 2과목 이상 점수가 있는 경우에만 계산합니다.
+students %>%
+  mutate(
+    valid_count = rowSums(!is.na(across(math:korean))),
+    avg = ifelse(valid_count >= 2, rowMeans(across(math:korean), na.rm = TRUE), NA)) %>%
+  group_by(class) %>%
+  filter(avg == max(avg, na.rm = TRUE)) %>%
+  select(class, name, avg)
+
+#Q. 2과목 이상 점수가 존재하며 평균이 75 이상. 출석률(attendance_rate)이 85 이상. 활동 참여(participated == TRUE)한 학생.
+total <- left_join(students, activities, by='name')
+total %>%
+  mutate(count = rowSums(!is.na(across(math:korean))),
+         sub_mean = ifelse(count>=2, rowMeans(across(math:korean), na.rm = TRUE), NA)) %>%
+  filter(count >= 2, sub_mean >= 75, attendance_rate >= 85, participated) %>% #participated에서 TRUE를 따로 설정안해도 됨
+  select(name, class, sub_mean, attendance_rate, participated)
+
+#Q. students 데이터프레임을 이용해,반(class)별 평균 수학 점수(math)의 막대 그래프를 그리세요.
+math_graph <- students %>%
+  group_by(class) %>%
+  summarise(avg_math = mean(math, na.rm = TRUE))
+
+ggplot(math_graph, aes(x=factor(class), y=avg_math)) + 
+  geom_bar(stat = "identity", fill = 'blue') +
+  labs(title = "반별 평균 수학점수", x="반", y="평균 수학 점수")
+
+Q. students 데이터에서 세 과목(math, english, korean) 점수의 편차(표준편차)가 가장 적은 학생을 반(class)별로 찾아 출력하세요.
+students %>%
+  filter(!is.na(math) & !is.na(english) & !is.na(korean)) %>% # 1. 결측치 제거: 세 과목 모두 NA가 아닌 학생만 필터
+  rowwise() %>%   # 2. 학생별 세 과목 점수의 표준편차 계산
+  mutate(subject_sd = sd(c(math, english, korean))) %>%
+  ungroup() %>%
+  group_by(class) %>%   # 3. 반(class)별로 표준편차가 가장 낮은 학생 필터
+  filter(subject_sd == min(subject_sd)) %>%
+  ungroup() %>%
+  select(class, name, math, english, korean, subject_sd) %>%   # 4. 필요한 열만 선택하고 정렬
+  arrange(class)
