@@ -1,19 +1,14 @@
-students <- data.frame(
-  name = c("Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Helen", "Ian"),
-  class = c(1, 1, 1, 2, 2, 2, 3, 3, 3),
-  math = c(90, 85, 88, 60, 95, 50, 77, 79, 78),
-  english = c(92, 86, 90, 62, 96, 52, 75, 78, 77),
-  korean = c(91, 84, 89, 65, 94, 55, 74, 79, 78)
+scores <- data.frame(
+  name = c("Anna", "Ben", "Chris"),
+  math = c(90, 85, 88),
+  english = c(85, 80, 82),
+  science = c(92, 78, 84),
+  history = c(88, 90, 85),
+  art = c(91, 87, 89)
 )
 
-Q. students 데이터에서 세 과목(math, english, korean) 점수의 편차(표준편차)가 가장 적은 학생을 반(class)별로 찾아 출력하세요.
-students %>%
-  filter(!is.na(math) & !is.na(english) & !is.na(korean)) %>% # 1. 결측치 제거: 세 과목 모두 NA가 아닌 학생만 필터
-  rowwise() %>%   # 2. 학생별 세 과목 점수의 표준편차 계산
-  mutate(subject_sd = sd(c(math, english, korean))) %>%
-  ungroup() %>%
-  group_by(class) %>%   # 3. 반(class)별로 표준편차가 가장 낮은 학생 필터
-  filter(subject_sd == min(subject_sd)) %>%
-  ungroup() %>%
-  select(class, name, math, english, korean, subject_sd) %>%   # 4. 필요한 열만 선택하고 정렬
-  arrange(class)
+#Q. 다음 scores 데이터프레임은 학생별로 다섯 과목의 점수를 담고 있다. 각 학생의 최고 점수를 계산하는 코드를 작성하시오.
+scores %>%
+  rowwise() %>%
+  mutate(max_score = max(c_across(math:art))) %>%
+  select(name, max_score)
