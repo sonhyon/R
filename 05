@@ -1,0 +1,13 @@
+movies <- tibble(
+  title = c("Movie A", "Movie B", "Movie C", "Movie D", "Movie E", "Movie F"),
+  genre = c("Action", "Drama", "Action", "Comedy", "Drama", "Comedy"),
+  rating = c(7.5, 8.2, 6.8, 7.0, 8.5, 7.3),
+  votes = c(15000, 24000, 8000, 6000, 12000, 7000),
+  year = c(2018, 2019, 2017, 2020, 2021, 2022)
+)
+
+#Q. 각 영화 장르별로 가장 높은 평점을 받은 영화를 찾아라.
+movies %>%
+  group_by(genre) %>%
+  slice_max(rating, n = 1, with_ties = FALSE) %>%
+  ungroup()
