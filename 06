@@ -1,0 +1,52 @@
+library(tibble)
+
+sales_data <- tibble(
+  product_id = c(1, 2, 3, 4, 5, 6),
+  product_name = c("Product A", "Product B", "Product C", "Product D", "Product E", "Product F"),
+  category = c("Electronics", "Clothing", "Electronics", "Furniture", "Clothing", "Furniture"),
+  sales_amount = c(1000, 500, 1500, 2000, 750, 1200),
+  units_sold = c(20, 50, 30, 15, 35, 25),
+  sale_date = as.Date(c("2023-01-01", "2023-01-01", "2023-01-02", "2023-01-02", "2023-01-03", "2023-01-03"))
+)
+
+#Q. 전체 판매 금액(sales_amount)의 총합을 구하시오.
+total_sales_amount = sum(sales_data$sales_amount)
+
+#Q. **category별로 총 판매 금액(sales_amount)**을 구하고, 가장 높은 판매 금액을 기록한 카테고리는 무엇인지 확인하시오.
+top_category <- sales_data %>%
+  group_by(category) %>%
+  summarise(total_sales_amount = sum(sales_amount)) %>%
+  slice_max(total_sales_amount, n = 1)
+
+print(top_category)
+
+#Q. 각 product_name별 판매 금액을 구하고, 가장 많이 팔린 제품을 확인하시오.
+top_product <- sales_data %>%
+  select(product_name, units_sold) %>%
+  slice_max(units_sold, n = 1)
+
+print(top_product)
+
+#Q. 판매 데이터를 연도별로 집계하여, 연도별 총 판매 금액을 구하시오.
+library(lubridate)
+
+sales_data %>%
+  mutate(year = year(sale_date)) %>%
+  group_by(year) %>%
+  summarise(total_sales = sum(sales_amount))
+
+
+#Q. ggplot2를 사용하여 category별 판매 금액을 나타내는 막대 그래프를 그리시오.
+cate_amount <- sales_data %>%
+  group_by(category) %>%
+  summarise(total_amount = sum(sales_amount))
+
+ggplot(data = cate_amount, aes(x = category, y = total_amount)) +
+  geom_col(fill = "steelblue") +
+  labs(title = "카테고리별 총 판매금액",
+       x = "카테고리",
+       y = "총 판매금액") +
+  theme_minimal()
+
+
+
