@@ -1,0 +1,12 @@
+library(tibble)
+
+sales_data <- tibble(
+  product = c("A", "A", "A", "B", "B", "B", "C", "C", "C"),
+  month = c("Jan", "Feb", "Mar", "Jan", "Feb", "Mar", "Jan", "Feb", "Mar"),
+  sales = c(120, 150, 130, 200, 180, 210, 90, 85, 100)
+)
+
+#Q.각 제품군(product)별로 판매량(sales)이 가장 높은 달(month)을 찾아라.
+sales_data %>%
+  group_by(product) %>%
+  filter(sales == max(sales))
