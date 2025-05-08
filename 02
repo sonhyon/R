@@ -10,5 +10,5 @@ scores <- data.frame(
 #Q. 다음 scores 데이터프레임은 학생별로 다섯 과목의 점수를 담고 있다. 각 학생의 최고 점수를 계산하는 코드를 작성하시오.
 scores %>%
   rowwise() %>%
-  mutate(max_score = max(c_across(math:art))) %>%
+  mutate(max_score = max(across(math:art))) %>%
   select(name, max_score)
