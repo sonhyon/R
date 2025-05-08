@@ -4,7 +4,7 @@ sales <- data.frame(
   revenue = c(200, 220, 180, 170, 210, 215)
 )
 
-#Q. 다음 sales 데이터프레임은 지점별 분기별 매출이다. 각 지점별 평균 매출을 구한 뒤, 전체에서 가장 매출이 낮은 분기 하나를 찾아 출력하시오.
+#Q. 지점별 평균 매출을 구하고, 이 중 평균 매출이 가장 낮은 지점을 찾아 출력하시오.
 sales %>%
   group_by(branch) %>%
   summarise(mean_revenue = mean(revenue)) %>%
