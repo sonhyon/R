@@ -9,23 +9,6 @@ sales_data <- tibble(
   sale_date = as.Date(c("2023-01-01", "2023-01-01", "2023-01-02", "2023-01-02", "2023-01-03", "2023-01-03"))
 )
 
-#Q. 전체 판매 금액(sales_amount)의 총합을 구하시오.
-total_sales_amount = sum(sales_data$sales_amount)
-
-#Q. **category별로 총 판매 금액(sales_amount)**을 구하고, 가장 높은 판매 금액을 기록한 카테고리는 무엇인지 확인하시오.
-top_category <- sales_data %>%
-  group_by(category) %>%
-  summarise(total_sales_amount = sum(sales_amount)) %>%
-  slice_max(total_sales_amount, n = 1)
-
-print(top_category)
-
-#Q. 각 product_name별 판매 금액을 구하고, 가장 많이 팔린 제품을 확인하시오.
-top_product <- sales_data %>%
-  select(product_name, units_sold) %>%
-  slice_max(units_sold, n = 1)
-
-print(top_product)
 
 #Q. 판매 데이터를 연도별로 집계하여, 연도별 총 판매 금액을 구하시오.
 library(lubridate)
