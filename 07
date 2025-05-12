@@ -12,6 +12,5 @@ sales_data %>%
   group_by(region, quarter, branch) %>%
   summarise(mean_sales = mean(sales), .groups = "drop") %>%
   group_by(region, quarter) %>%
-  slice_max(mean_sales, n = 2) %>%
-  arrange(region,
-          
+  slice_max(mean_sales, n = 2, with_ties = FALSE) %>%
+  arrange(region, quarter, desc(mean_sales))
