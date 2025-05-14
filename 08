@@ -2,7 +2,6 @@ library(tibble)
 library(dplyr)
 library(tidyr)
 
-
 sales_data <- tibble(
   region = c("East", "East", "East", "East", "West", "West", "West", "West", "North", "North"),
   branch = c("A", "B", "A", "C", "D", "E", "D", "F", "G", "H"),
@@ -12,29 +11,10 @@ sales_data <- tibble(
 
 
 #Q. 각 지점의 분기별 매출 변화율을 바탕으로, **Q1에서 Q2로 평균 증가율이 가장 높은 지역(region)**을 구하시오.
-
-# 분기별 매출을 wide format으로 변환
-branch_growth <- sales_data %>%
+sales_data %>%
   pivot_wider(names_from = quarter, values_from = sales) %>%
-  filter(!is.na(Q1) & !is.na(Q2)) %>%  # Q1과 Q2 모두 있는 지점만 필터
-  mutate(growth_rate = (Q2 - Q1) / Q1 * 100)  # 증가율 계산
+  filter(!is.na(Q1) & !is.na(Q2)) %>%
+  mutate(rating = (Q2 - Q1) / Q1 * 100) %>%
+  slice_max(rating) %>%
+  select(region, rating)
 
-region_avg_growth <- branch_growth %>%
-  group_by(region) %>%
-  summarise(avg_growth = round(mean(growth_rate), 1))
-
-region_avg_growth %>%
-  slice_max(avg_growth)
-
-
-library(tidyr)
-library(tibble)
-
-data <- tibble(
-  name = c("Alice", "Alice", "Bob", "Bob"),
-  test = c("Math", "English", "Math", "English"),
-  score = c(90, 85, 80, 88)
-)
-
-data %>%
-  pivot_wider(names_from = test, values_from = score)
