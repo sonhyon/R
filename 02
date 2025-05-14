@@ -14,8 +14,7 @@ customer_data <- data.frame(
 # 상위 6개 행 확인
 head(customer_data)
 
-
-Q. 주어진 고객 구매 데이터에서 고객을 군집화하여 주요 고객 그룹의 특성을 도출하시오.
+#Q. 주어진 고객 구매 데이터에서 고객을 군집화하여 주요 고객 그룹의 특성을 도출하시오.
 # 필요한 패키지
 library(dplyr)
 library(ggplot2)
