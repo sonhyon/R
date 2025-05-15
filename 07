@@ -1,0 +1,26 @@
+# 예제 고객 구매 데이터 생성
+customer_data <- data.frame(
+  customer_id = 1:10,
+  age = c(23, 35, 31, 45, 52, 27, 61, 39, 48, 55),
+  gender = c("F", "M", "F", "M", "F", "M", "F", "M", "F", "M"),
+  purchase_amount = c(120, 340, 560, 230, 410, 150, 300, 500, 270, 390)
+)
+
+# 데이터 확인
+print(customer_data)
+
+
+#Q. 다음 고객 구매 데이터에서 연령대별 평균 구매 금액을 구하고, 가장 소비가 많은 연령대를 찾아보세요.
+customer_data$age_group <- cut( #R의 cut() 함수는 연속형 숫자 데이터를 범주형(구간별) 데이터로 변환할 때 사용합니다. 쉽게 말해, 숫자를 "구간"으로 나눠서 라벨을 붙여주는 함수입니다.
+  customer_data$age,
+  breaks = c(20, 30, 40, 50, 60, 70),
+  labels = c("20대", "30대", "40대", "50대", "60대"),
+  right = FALSE
+)
+
+avg_purchase_by_age <- aggregate(purchase_amount ~ age_group, data = customer_data, mean)
+
+print(avg_purchase_by_age)
+
+max_group <- avg_purchase_by_age[which.max(avg_purchase_by_age$purchase_amount), ]
+cat("가장 소비가 많은 연령대는", max_group$age_group, "이며, 평균 구매 금액은", max_group$purchase_amount, "입니다.\n")
