@@ -1,0 +1,16 @@
+df <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "Diana", "Ethan", "Fiona", "George", "Helen", "Ian", "Jenny"),
+  age = c(23, 30, 22, 28, 35, 27, 31, 24, 33, 29),
+  gender = c("Female", "Male", "Male", "Female", "Male", "Female", "Male", "Female", "Male", "Female"),
+  score = c(82, 75, 90, 88, 70, 93, 85, 78, 95, 91)
+)
+
+print(df)
+
+
+#Q.나이(age)가 30 이상인 사람 중에서 점수(score)가 상위 50%에 해당하는 사람들의 이름(name)과 점수(score)를 내림차순으로 출력하세요.
+df %>%
+  filter(age >= 30) %>%                                  # 나이 30 이상 필터
+  filter(score >= quantile(score, 0.5)) %>%             # 상위 50% 점수 필터링
+  select(name, score) %>%
+  arrange(desc(score))                                   # 점수 내림차순 정렬
