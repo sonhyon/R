@@ -1,0 +1,33 @@
+library(dplyr)
+
+get_age_group <- function(age) {
+  if (age < 25) return("Under 25")
+  else if (age <= 30) return("25-30")
+  else return("Over 30")
+}
+
+df <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "Diana", "Ethan", "Fiona", "George", "Helen", "Ian", "Jenny"),
+  age = c(23, 30, 22, 28, 35, 27, 31, 24, 33, 29),
+  gender = c("Female", "Male", "Male", "Female", "Male", "Female", "Male", "Female", "Male", "Female"),
+  score = c(82, 75, 90, 88, 70, 93, 85, 78, 95, 91)
+)
+
+# 연령대 컬럼 추가
+df <- df %>%
+  mutate(age_group = sapply(age, get_age_group))
+
+# 데이터 확인
+print(df)
+
+
+
+#Q.각 성별(gender)과 연령대(age_group) 조합별로 평균 점수(score)를 구한 후, 평균 점수가 전체 평균보다 높은 조합만 출력하세요.
+overall_mean <- mean(df$score)
+
+result <- df %>%
+  group_by(gender, age_group) %>%
+  summarise(mean_score = mean(score), .groups = 'drop') %>%
+  filter(mean_score > overall_mean)
+
+print(result)
