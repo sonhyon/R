@@ -1,0 +1,22 @@
+df <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "Diana", "Ethan", "Fiona", "George", "Helen", "Ian", "Jenny"),
+  age = c(23, 30, 22, 28, 35, 27, 31, 24, 33, 29),
+  gender = c("Female", "Male", "Male", "Female", "Male", "Female", "Male", "Female", "Male", "Female"),
+  score = c(82, 75, 90, 88, 70, 93, 85, 78, 95, 91)
+)
+
+
+
+#Q.각 사람(name)의 점수가 자신의 성별 평균보다 높은 경우만 추출하여 이름(name), 성별(gender), 점수(score), 성별 평균을 함께 출력하세요.
+gender_avg <- df %>%
+  group_by(gender) %>%
+  summarise(gender_mean = mean(score))
+
+df_with_avg <- df %>%
+  left_join(gender_avg, by = "gender")
+
+result <- df_with_avg %>%
+  filter(score > gender_mean) %>%
+  select(name, gender, score, gender_mean)
+
+print(result)
