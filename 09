@@ -1,0 +1,28 @@
+customer_data <- data.frame(
+  고객ID = 1:10,
+  성별 = c("남", "여", "남", "여", "남", "여", "남", "여", "남", "여"),
+  연령대 = c("20대", "30대", "40대", "20대", "30대", "40대", "20대", "30대", "40대", "20대"),
+  월평균구매금액 = c(150000, 230000, 180000, 120000, 210000, 250000, 170000, 220000, 190000, 130000),
+  구매횟수 = c(5, 7, 4, 3, 6, 8, 5, 7, 4, 3)
+)
+print(customer_data)
+
+
+#Q.주어진 고객 구매 데이터에서 연령대별, 성별에 따른 월평균 구매 금액 차이가 통계적으로 유의한지 분석하시오.
+
+customer_data <- customer_data %>%
+  rename(
+    customer_id = 고객ID,
+    gender = 성별,
+    age_group = 연령대,
+    avg_monthly_purchase = 월평균구매금액,
+    purchase_count = 구매횟수
+  )
+
+customer_data$gender <- as.factor(customer_data$gender)
+customer_data$age_group <- as.factor(customer_data$age_group)
+
+# 4. 이원 분산분석 실행
+anova_result <- aov(avg_monthly_purchase ~ gender * age_group, data = customer_data)
+
+summary(anova_result)
