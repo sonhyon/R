@@ -1,0 +1,14 @@
+data <- data.frame(
+  CustomerID = 1:100,
+  Age = sample(20:60, 100, replace = TRUE),
+  Gender = sample(c("Male", "Female"), 100, replace = TRUE),
+  ProductType = sample(c("Electronics", "Clothing", "Groceries"), 100, replace = TRUE),
+  PurchaseAmount = round(runif(100, 10, 500), 2),
+  RepeatedPurchase = sample(c(0, 1), 100, replace = TRUE, prob = c(0.6, 0.4))
+)
+head(data)
+
+
+#Q.상품 유형에 따라 고객의 재구매율에 차이가 있는지 분석하시오.
+table(data$ProductType, data$RepeatedPurchase)
+chisq.test(table(data$ProductType, data$RepeatedPurchase))
