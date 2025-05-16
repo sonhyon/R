@@ -1,0 +1,21 @@
+set.seed(456)
+
+data <- data.frame(
+  CustomerID = 1:120,
+  Age = sample(18:65, 120, replace = TRUE),
+  Gender = sample(c("Male", "Female"), 120, replace = TRUE),
+  AdWatchTime = round(rnorm(120, mean = 15, sd = 5), 1),  # 광고 시청 시간 (분)
+  PurchaseAmount = round(50 + rnorm(120, mean = 2.5, sd = 1.5) * rnorm(120, mean = 15, sd = 5), 2)  # 구매 금액
+)
+head(data)
+
+
+#Q.광고 시청 시간과 구매 금액 사이에 선형적인 관계가 있는지 분석하시오.
+plot(data$AdWatchTime, data$PurchaseAmount,
+     xlab = "광고 시청 시간(분)",
+     ylab = "구매 금액(원)",
+     main = "광고 시청 시간과 구매 금액의 관계")
+abline(lm(PurchaseAmount ~ AdWatchTime, data = data), col = "blue", lwd = 2)
+
+model <- lm(PurchaseAmount ~ AdWatchTime, data = data)
+summary(model)
