@@ -1,0 +1,14 @@
+customer_data3 <- data.frame(
+  customer_id = 1:12,
+  purchase_count = c(5, 7, 4, 3, 6, 8, 5, 7, 4, 2, 8, 9),
+  avg_monthly_purchase = c(150000, 230000, 180000, 120000, 210000, 250000, 170000, 220000, 190000, 130000, 240000, 260000),
+  used_coupon = c(1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1),  # 1: 사용함, 0: 사용 안 함
+  total_purchase = c(750000, 1610000, 720000, 360000, 1260000, 2000000, 850000, 1540000, 760000, 260000, 1920000, 2340000)
+)
+print(customer_data3)
+
+
+#Q.고객의 구매 횟수, 평균 구매 금액, 쿠폰 사용 여부를 바탕으로 총 구매 금액을 예측할 수 있는 모델을 만들어라.
+model <- lm(total_purchase ~ purchase_count + avg_monthly_purchase + used_coupon, data = customer_data3)
+
+summary(model)
