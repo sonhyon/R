@@ -1,4 +1,4 @@
-customer_data3 <- data.frame(
+customer_data <- data.frame(
   customer_id = 1:12,
   purchase_count = c(5, 7, 4, 3, 6, 8, 5, 7, 4, 2, 8, 9),
   avg_monthly_purchase = c(150000, 230000, 180000, 120000, 210000, 250000, 170000, 220000, 190000, 130000, 240000, 260000),
