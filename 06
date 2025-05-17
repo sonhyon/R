@@ -14,37 +14,17 @@ customer_data <- data.frame(
 # 상위 6개 행 확인
 head(customer_data)
 
-#Q. 주어진 고객 구매 데이터에서 고객을 군집화하여 주요 고객 그룹의 특성을 도출하시오.
-# 필요한 패키지
-library(dplyr)
-library(ggplot2)
 
-# 군집화에 사용할 변수만 선택
-customer_cluster_data <- customer_data %>%
+#Q. 주어진 고객 구매 데이터에서 고객을 군집화하여 주요 고객 그룹의 특성을 도출하시오.
+customer_cluster_data  <- customer_data %>%
   select(Age, MonthlySpend, VisitFrequency)
 
-# K-means 클러스터링 (k=3으로 가정)
-set.seed(123)
-kmeans_result <- kmeans(customer_cluster_data, centers = 3)
+kmeans_result <- kmeans(customer_cluster_data , center = 3)
 
-# 클러스터 결과를 데이터에 추가
 customer_data$Cluster <- as.factor(kmeans_result$cluster)
 
-# 각 클러스터의 평균 값 요약
-cluster_summary <- customer_data %>%
-  group_by(Cluster) %>%
-  summarise(
-    Count = n(),
-    Avg_Age = mean(Age),
-    Avg_Spend = mean(MonthlySpend),
-    Avg_Visit = mean(VisitFrequency)
-  )
-
-print(cluster_summary)
-
-# 시각화 (예: 나이 vs 지출, 군집 색상 구분)
-ggplot(customer_data, aes(x = Age, y = MonthlySpend, color = Cluster)) +
+ggplot(customer_data, aes(x=Age, y=MonthlySpend, color=Cluster)) +
   geom_point(size = 2) +
   labs(title = "고객 군집화 결과 (K-means)", x = "나이", y = "월간 지출") +
   theme_minimal()
- 
+
