@@ -11,9 +11,9 @@ head(customer_data)
 
 #Q.고객의 연령대와 가입 경과 기간에 따라 이탈 여부(Churn)에 유의미한 차이가 있는지 분석하시오
 table_age_churn <- table(customer_data$age_group, customer_data$churned)
-chisq.test(table_age_churn)
+chisq.test(table_age_churn)                                                #카이제곱 검정은 두 범주형 변수 사이의 관계를 검정하는 데 쓰입니다
 
-t.test(membership_duration ~ churned, data = customer_data) #t검정 - 두 그룹 간의 평균 차이가 통계적으로 유의한가?"를 검정하고 싶을 때 사용
+t.test(membership_duration ~ churned, data = customer_data)                #t검정 - 두 그룹 간의 평균 차이가 통계적으로 유의한가?"를 검정하고 싶을 때 사용
 
 ggplot(customer_data, aes(x = churned, y = membership_duration, fill = churned)) +
   geom_boxplot() +
