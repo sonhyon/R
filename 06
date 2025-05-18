@@ -1,17 +1,12 @@
 set.seed(123)
-
-# 고객 수
 n <- 100
 
-# 고객 데이터 생성
 customer_data <- data.frame(
   CustomerID = 1:n,
   Age = round(rnorm(n, mean = 35, sd = 10)),
   MonthlySpend = round(rnorm(n, mean = 300, sd = 80)),
   VisitFrequency = sample(1:10, n, replace = TRUE)
 )
-
-# 상위 6개 행 확인
 head(customer_data)
 
 
@@ -27,4 +22,3 @@ ggplot(customer_data, aes(x=Age, y=MonthlySpend, color=Cluster)) +
   geom_point(size = 2) +
   labs(title = "고객 군집화 결과 (K-means)", x = "나이", y = "월간 지출") +
   theme_minimal()
-
