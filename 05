@@ -1,0 +1,34 @@
+set.seed(100)
+
+n <- 500
+
+data <- data.frame(
+  customer_id = 1:n,
+  gender = sample(c("Male", "Female"), n, replace = TRUE),
+  age = sample(18:65, n, replace = TRUE),
+  total_purchase = round(rnorm(n, mean = 300, sd = 120), 2),  # 총 구매 금액
+  num_orders = sample(1:10, n, replace = TRUE)                # 구매 횟수
+)
+
+data$age_group <- cut(data$age,
+                      breaks = c(17, 29, 39, 49, 59, 70),
+                      labels = c("18–29", "30–39", "40–49", "50–59", "60+"))
+head(data)
+
+
+#Q.고객 데이터를 활용하여 성별과 연령대별 평균 구매 금액과 구매 횟수를 요약·시각화하라
+library(dplyr)
+df <- data %>%
+  group_by(gender, age_group) %>%
+  summarise(mean_total_purchase = mean(total_purchase),
+            mean_num_orders = mean(num_orders))
+head(df)
+
+
+ggplot(df, aes(x = age_group, y = mean_total_purchase, fill = gender)) +
+  geom_col(position = "dodge") 
+
+ggplot(df, aes(x = age_group, y = gender, fill = mean_num_orders)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue")
+
