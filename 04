@@ -11,7 +11,7 @@ head(data)
 
 
 #Q.광고 시청 시간과 구매 금액 사이에 선형적인 관계가 있는지 분석하시오.
-plot(data$AdWatchTime, data$PurchaseAmount,
+plot(PurchaseAmount ~ AdWatchTime, data = data,
      xlab = "광고 시청 시간",
      ylab = "구매 금액",
      main = "광고시청시간과 구매금액의 관계")
