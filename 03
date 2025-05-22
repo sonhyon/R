@@ -1,0 +1,23 @@
+employee_data <- data.frame(
+  dept = sample(c("Sales", "HR", "IT", "Finance"), 100, replace = TRUE),
+  years = sample(1:20, 100, replace = TRUE),
+  location = sample(c("Seoul", "Busan", "Incheon"), 100, replace = TRUE),
+  salary = round(rnorm(100, mean = 5000, sd = 800), 0)
+)
+
+head(employee_data)
+
+
+#Q. 직원들의 부서, 근속연수, 근무지역, 월급 데이터를 기반으로, 근무지역별로 부서와 근속연수에 따른 평균 월급 차이를 분석하세요.
+summary_df <- employee_data %>%
+  mutate(years_group = cut(years, breaks = c(0, 5, 10, 15, 20),
+                           labels = c("1-5", "6-10", "11-15", "16-20"))) %>%
+  group_by(location, dept, years_group) %>%
+  summarise(mean_salary = mean(salary), .groups = "drop")
+print(summary_df)
+
+
+ggplot(summary_df, aes(x = years_group, y = mean_salary, fill = dept)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ location)
+
