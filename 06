@@ -1,0 +1,21 @@
+install.packages("palmerpenguins") 
+library(palmerpenguins)
+
+data("penguins")
+
+head(penguins)
+
+
+#Q.펭귄의 성별(sex)과 종(species) 간에 관련성이 있는지 탐색하라. 시각화를 통해 분포를 비교하고, 통계적으로 유의한 관계인지 검정하라.
+cl_pen <- penguins %>%
+  select(species, sex) %>%
+  filter(!is.na(species) & !is.na(sex))
+
+tb_pen <- table(penguins$species, penguins$sex)
+chisq.test(tb_pen)  
+
+ggplot(penguins_clean, aes(x = species, fill = sex)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(title = "종별 성비 분포", x = "종", y = "비율") +
+  theme_minimal()
