@@ -9,6 +9,6 @@ df <- data.frame(
 head(df)
 library(dplyr)
 
-#Q.연령대(age_group)와 운동 여부(exercise)에 따라 평균 수면 시간(sleep_hours)에 차이가 있는지를 분석하세요
+#Q.연령대(age_group)와 운동 여부(exercise)에 따라 평균 수면 시간(sleep_hours)에 차이가 있는지를 분석하세요 (상호작용도 알아보기)
 anova_result <- aov(sleep_hours ~ age_group * exercise, data = df)
 summary(anova_result)
