@@ -10,26 +10,7 @@ head(penguins)
 penguins <- penguins %>%
   filter(!is.na(bill_length_mm) & !is.na(body_mass_g))
 
-#Q. 펭귄의 종(species)별로 부리 길이(bill_length_mm)와 몸무게(body_mass_g)의 분포를 시각화하고, 종에 따라 어떤 차이가 있는지 설명해봐.
-penguins_clean <- penguins %>%
-  filter(!is.na(bill_length_mm) & !is.na(body_mass_g))
-
-# 부리 길이 분포
-ggplot(penguins_clean, aes(x = species, y = bill_length_mm, fill = species)) +
-  geom_boxplot() +
-  labs(title = "종별 부리 길이 분포", y = "bill_length_mm") +
-  theme_minimal()
-
-# 몸무게 분포
-ggplot(penguins_clean, aes(x = species, y = body_mass_g, fill = species)) +
-  geom_boxplot() +
-  labs(title = "종별 몸무게 분포", y = "body_mass_g") +
-  theme_minimal()
-
-# 결측치 제거
-penguins_clean <- penguins %>%
-  filter(!is.na(bill_length_mm) & !is.na(body_mass_g))
-
+#Q. 펭귄의 종(species)별로 부리 길이(bill_length_mm)와 몸무게(body_mass_g)에 따라 어떤 차이가 있는지 설명해봐.
 # 부리 길이에 대한 ANOVA
 anova_result_bill <- aov(bill_length_mm ~ species, data = penguins_clean)
 summary(anova_result_bill)
