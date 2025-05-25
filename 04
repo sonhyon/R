@@ -4,24 +4,14 @@ library(palmerpenguins)
 data("penguins")
 
 head(penguins)
-
+penguins <- penguins %>%
+  filter(!is.na(body_mass_g) & !is.na(sex))
 
 #Q. penguins 데이터를 사용해서 펭귄의 성별(sex)에 따라 체중(body_mass_g)에 차이가 있는지를 종(species)별로 분석하고, 그 차이가 통계적으로 유의한지 판단하라. 결과를 시각화하고 해석하라.
-pen_clear <- penguins %>%
-  filter(!is.na(sex) & !is.na(body_mass_g))
-
-pen_clear %>%
-  group_by(species, sex) %>%
-  summarise(mean_body = mean(body_mass_g), .groups= 'drop')
-
-
-ggplot(data = pen_clear, aes(x = sex, y = body_mass_g, fill = sex)) +
+ggplot(penguins, aes(x = sex, y=body_mass_g, fill = sex)) +
   geom_boxplot() +
-  facet_wrap(~ species) +
-  labs(title = "성별에 따른 펭귄 몸무게 분포 (종별)", y = "Body Mass (g)", x = "Sex") +
-  theme_minimal()
+  facet_wrap(~ species)
 
-# 각 종별로 t-test
 penguins_clean <- pen_clear
 
 adelie <- penguins_clean %>% filter(species == "Adelie")
