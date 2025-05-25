@@ -10,10 +10,6 @@ head(penguins)
 pen_clear <- penguins %>%
   filter(!is.na(island) & !is.na(body_mass_g))
 
-df <- pen_clear %>%
-  group_by(island) %>%
-  summarise(mean_body = mean(body_mass_g))
-
 anova_result <- aov(body_mass_g ~ island, data=pen_clear)
 summary(anova_result)
 TukeyHSD(anova_result)
