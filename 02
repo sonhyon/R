@@ -6,18 +6,35 @@ employee_data <- data.frame(
 )
 
 head(employee_data)
+table(employee_data$dept)
 
+#Q. 근무지역별로 부서와 근속연수에 따른 평균 월급 차이를 분석하세요.
+busan <- employee_data %>%
+  filter(location == "Busan")
+incheon <- employee_data %>%
+  filter(location == "Incheon")
+seoul <- employee_data %>%
+  filter(location == "Seoul")
 
-#Q. 직원들의 부서, 근속연수, 근무지역, 월급 데이터를 기반으로, 근무지역별로 부서와 근속연수에 따른 평균 월급 차이를 분석하세요.
-summary_df <- employee_data %>%
-  mutate(years_group = cut(years, breaks = c(0, 5, 10, 15, 20),
-                           labels = c("1-5", "6-10", "11-15", "16-20"))) %>%
-  group_by(location, dept, years_group) %>%
-  summarise(mean_salary = mean(salary), .groups = "drop")
-print(summary_df)
+head(busan)
+busan_anova <- aov(salary ~ dept, data =busan)
+summary(busan_anova)
 
+incheon_anova <- aov(salary ~ dept, data = incheon)
+summary(incheon_anova)
 
-ggplot(summary_df, aes(x = years_group, y = mean_salary, fill = dept)) +
+seoul_anova <- aov(salary ~ dept, data = seoul)
+summary(seoul_anova)
+
+ggplot(data = employee_data, aes(x=dept, y = salary, fill = dept)) +
   geom_bar(stat = "identity", position = "dodge") +
   facet_wrap(~ location)
 
+employee_data %>%
+  group_by(location, dept) %>%
+  summarise(mean_salary = mean(salary)) %>%
+  ggplot(aes(x = dept, y = mean_salary, fill = dept)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~ location) +
+  labs(title = "근무지역별 부서 평균 월급", y = "평균 월급", x = "부서") +
+  theme_minimal()
