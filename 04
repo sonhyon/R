@@ -1,0 +1,17 @@
+df <- data.frame(
+  group = rep(c("A", "B"), each = 10),
+  x = 1:20,
+  y = c(5,7,6,8,9,6,7,5,8,9,  12,14,13,15,14,16,15,13,12,14)
+)
+head(df)
+
+
+#Q. 아래 df 데이터에서 group별 y 값의 평균과 표준편차를 계산하고, 각 행에 대해 y 값이 자신의 그룹 평균보다 큰 경우만 필터링하여 새로운 데이터프레임을 만드세요.
+library(dplyr)
+df %>%
+  group_by(group) %>%
+  summarise(mean_y = mean(y),
+            sd_y = sd(y), .groups = 'drops')
+
+
+
