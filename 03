@@ -1,0 +1,64 @@
+set.seed(123)
+
+data <- data.frame(
+  customer_id = 1:200,
+  age = sample(20:65, 200, replace = TRUE),
+  gender = sample(c("M", "F"), 200, replace = TRUE),
+  region = sample(c("Seoul", "Busan", "Incheon", "Daegu"), 200, replace = TRUE),
+  membership = sample(c("Bronze", "Silver", "Gold"), 200, replace = TRUE, prob = c(0.3, 0.4, 0.3)),
+  visit_count = rpois(200, lambda = 4),
+  total_spent = round(rnorm(200, mean = 300, sd = 100), 1),
+  last_visit = sample(seq(as.Date('2023-01-01'), as.Date('2023-12-31'), by="day"), 200, replace = TRUE)
+)
+
+data$total_spent[data$total_spent < 0] <- 0 # 이상치 처리
+head(data)
+
+
+#Q.고객의 연령, 성별, 지역, 멤버십 등급, 방문 횟수, 마지막 방문일 등의 요인이 총 지출(total_spent)에 어떤 영향을 주는지, 시각화와 통계 요약을 통해 주요 인사이트를 도출하시오
+# 0. 필수 패키지 로딩
+library(ggplot2)
+library(dplyr)
+library(car)
+
+# 1. 날짜 처리
+data$days_since_last_visit <- as.numeric(Sys.Date() - data$last_visit)
+
+# 2. 회귀 모델
+lm_model <- lm(total_spent ~ age + gender + region + membership + visit_count + days_since_last_visit, data = data)
+
+cat("🔍 회귀 결과 요약:\n")
+print(summary(lm_model))
+
+# 3. 다중공선성 검사
+cat("\n📏 다중공선성 (VIF) 검사:\n")
+print(vif(lm_model))
+
+# 4. 시각화 1: 방문 횟수 vs 지출
+ggplot(data, aes(x = visit_count, y = total_spent, color = membership)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(title = "방문 횟수 vs 총 지출 (멤버십별)", x = "방문 횟수", y = "총 지출")
+
+# 5. 시각화 2: 연령 vs 지출
+ggplot(data, aes(x = age, y = total_spent)) +
+  geom_point(alpha = 0.5, color = "darkgreen") +
+  geom_smooth(method = "lm", color = "black", se = FALSE) +
+  theme_minimal() +
+  labs(title = "연령과 총 지출의 관계", x = "나이", y = "총 지출")
+
+# 6. 시각화 3: 지역별 박스플롯
+ggplot(data, aes(x = region, y = total_spent, fill = region)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "지역별 총 지출 분포", x = "지역", y = "총 지출")
+
+# 7. 시각화 4: 멤버십 등급별 평균 지출
+data %>%
+  group_by(membership) %>%
+  summarise(mean_spent = mean(total_spent)) %>%
+  ggplot(aes(x = membership, y = mean_spent, fill = membership)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "멤버십 등급별 평균 지출", x = "멤버십", y = "평균 지출")
