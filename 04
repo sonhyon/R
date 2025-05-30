@@ -7,11 +7,12 @@ head(df)
 
 
 #Q. 아래 df 데이터에서 group별 y 값의 평균과 표준편차를 계산하고, 각 행에 대해 y 값이 자신의 그룹 평균보다 큰 경우만 필터링하여 새로운 데이터프레임을 만드세요.
-library(dplyr)
-df %>%
+df_filtered <- df %>%
   group_by(group) %>%
-  summarise(mean_y = mean(y),
-            sd_y = sd(y), .groups = 'drops')
+  mutate(mean_y = mean(y),
+         sd_y = sd(y)) %>%
+  filter(y > mean_y) %>%
+  ungroup()
 
-
+df_filtered
 
