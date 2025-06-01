@@ -1,0 +1,21 @@
+# 초기 데이터 생성
+set.seed(123)
+data <- data.frame(
+  group = rep(c("A", "B", "C"), each = 50),
+  age = round(rnorm(150, mean = 30, sd = 5)),
+  income = round(rnorm(150, mean = 50000, sd = 8000)),
+  score = round(rnorm(150, mean = 75, sd = 10))
+)
+
+# 데이터 살짝 변형 (group별로 score에 차이 존재하도록)
+data$score[data$group == "A"] <- data$score[data$group == "A"] + 5
+data$score[data$group == "C"] <- data$score[data$group == "C"] - 5
+
+
+#Q.“세 그룹(A, B, C) 간에 score 평균 차이가 통계적으로 유의한지 검정하고, 유의하다면 어떤 그룹 간 차이가 있는지 분석하시오.”
+head(data)
+
+anova_result <- aov(score ~ group, data = data)
+summary(anova_result)
+
+TukeyHSD(anova_result, which = "group")
