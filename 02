@@ -1,3 +1,61 @@
 data(mtcars)
 
 #Q. mtcars 데이터를 이용하여 mpg에 영향을 미치는 변수들을 선정하고, 질적 변수와 상호작용을 고려한 다중회귀모형을 적합한 뒤 회귀 가정을 검토하고 모델의 유의성을 평가하시오.
+
+✅ 변수 선택 과정
+상관관계 확인
+cor(mtcars[, c("mpg", "wt", "hp", "disp", "drat", "qsec")])
+
+다중공선성 (VIF 확인)
+library(car)
+vif(model)  # 10 이상이면 다중공선성 의심
+
+변수 선택 (stepwise)
+library(MASS)
+full_model <- lm(mpg ~ ., data = mtcars)
+step_model <- stepAIC(full_model, direction = "both")
+summary(step_model)
+
+✅ 회귀 모델의 의미 및 검정 이해
+# 모델 적합
+model <- lm(mpg ~ wt + hp + disp, data = mtcars)
+summary(model)
+
+# t-검정: Coefficients에서 각 변수의 Pr(>|t|)
+# F-검정: summary(model) 맨 아래 F-statistic
+
+✅ 질적 변수 처리
+# 질적 변수로 변환 (factor 처리)
+mtcars$am <- factor(mtcars$am, labels = c("Automatic", "Manual"))
+mtcars$gear <- factor(mtcars$gear)
+mtcars$cyl <- factor(mtcars$cyl)
+
+# 질적 변수 포함 모델
+model_qual <- lm(mpg ~ wt + hp + am + gear, data = mtcars)
+summary(model_qual)
+
+✅ 회귀 가정 검토
+# 등분산성 (Homoscedasticity), 선형성
+plot(model_qual$fitted.values, resid(model_qual))
+abline(h = 0, col = "red")
+library(lmtest)
+bptest(model_qual)
+
+# 독립성 (Independence)
+dwtest(model_qual)
+
+# 정규성 (Normality)
+qqnorm(resid(model_qual))
+qqline(resid(model_qual), col = "blue")
+shapiro.test(resid(model_qual))
+
+✅ 상호작용 / 동일성 검정 (Interaction / Homogeneity)
+# 상호작용이 있는 모델
+interaction_model <- lm(mpg ~ wt * am + hp, data = mtcars)
+summary(interaction_model)
+
+# 비교: 상호작용 없는 모델
+no_interaction_model <- lm(mpg ~ wt + am + hp, data = mtcars)
+
+# 동일성 검정: 두 모델 비교
+anova(no_interaction_model, interaction_model)
