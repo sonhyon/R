@@ -2,27 +2,27 @@ data(mtcars)
 
 #Q. mtcars 데이터를 이용하여 mpg에 영향을 미치는 변수들을 선정하고, 질적 변수와 상호작용을 고려한 다중회귀모형을 적합한 뒤 회귀 가정을 검토하고 모델의 유의성을 평가하시오.
 
-✅ 회귀 모델의 의미 및 검정 이해
-# 모델 적합
-model <- lm(mpg ~ wt + hp + disp, data = mtcars)
-summary(model)
-
-# t-검정: Coefficients에서 각 변수의 Pr(>|t|)
-# F-검정: summary(model) 맨 아래 F-statistic
-
 ✅ 변수 선택 과정
 상관관계 확인
 cor(mtcars[, c("mpg", "wt", "hp", "disp", "drat", "qsec")])
-
-다중공선성 (VIF 확인)
-library(car)
-vif(model)  # 10 이상이면 다중공선성 의심
 
 변수 선택 (stepwise)
 library(MASS)
 full_model <- lm(mpg ~ ., data = mtcars)
 step_model <- stepAIC(full_model, direction = "both")
 summary(step_model)
+
+다중공선성 (VIF 확인)
+library(car)
+vif(model)  # 10 이상이면 다중공선성 의심
+
+✅ 회귀 모델의 의미 및 검정 이해
+# 모델 적합
+model <- lm(mpg ~ wt + qsec + am, data = mtcars)
+summary(model)
+
+# t-검정: Coefficients에서 각 변수의 Pr(>|t|)
+# F-검정: summary(model) 맨 아래 F-statistic
 
 ✅ 질적 변수 처리
 # 질적 변수로 변환 (factor 처리)
