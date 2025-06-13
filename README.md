@@ -1,4 +1,6 @@
 # Memo_R
+기술 통계학
+
 
 [데이터 분석]
 1. 설명적 분석 (Descriptive Analytics)
