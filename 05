@@ -12,31 +12,17 @@ data$score[data$group == "A"] <- data$score[data$group == "A"] + 5
 data$score[data$group == "C"] <- data$score[data$group == "C"] - 5
 
 
-#Q.“데이터에서 그룹별로 age와 income 변수의 중심 경향과 산포도를 각각 구하고, 두 변수 간 상관관계를 그룹별로 분석하시오
-summary_stats <- data %>%
-  group_by(group) %>%
-  summarise(
-    mean_age = mean(age),
-    sd_age = sd(age),
-    median_age = median(age),
-    IQR_age = IQR(age),
-    mean_income = mean(income),
-    sd_income = sd(income),
-    median_income = median(income),
-    IQR_income = IQR(income)
-  )
-print(summary_stats)
+#Q.“데이터에서 그룹별로 age와 income 변수의 산포도를 각각 구하고, 두 변수 간 상관관계를 그룹별로 분석하시오
 
-# 2. 그룹별 상관계수 계산
-cor_stats <- data %>%
-  group_by(group) %>%
-  summarise(correlation = cor(age, income))
-print(cor_stats)
-
-# 3. 그룹별 산점도 시각화 (color 사용)
+# 그룹별 산점도 시각화 (color 사용)
 ggplot(data, aes(x = age, y = income, color = group)) +
   geom_point(alpha = 0.7) +
   facet_wrap(~group) +
   theme_minimal() +
   labs(title = "그룹별 Age와 Income 산점도", x = "Age", y = "Income")
 
+# 그룹별 상관계수 계산
+cor_stats <- data %>%
+  group_by(group) %>%
+  summarise(correlation = cor(age, income))
+print(cor_stats)
