@@ -1,0 +1,35 @@
+set.seed(1010)
+customer_behavior <- data.frame(
+  level = factor(sample(c("Bronze", "Silver", "Gold", "Platinum"), 300, replace = TRUE, prob = c(0.4, 0.3, 0.2, 0.1))),
+  purchase_count = rpois(300, lambda = c(3,5,8,12)[sample(1:4, 300, replace = TRUE)]),
+  total_amount = round(rnorm(300, mean = c(100, 200, 400, 800)[sample(1:4, 300, replace = TRUE)], sd = 50), 0)
+)
+
+#Q. customer_behavior 데이터에서 ‘회원 등급(level)’별로 최근 6개월간 구매 건수(purchase_count)와 구매 금액(total_amount)의 상관관계를 분석하고, 회원 등급별로 고객 충성도 차이를 시각화 및 해석하시오.
+head(customer_behavior)
+
+customer_behavior %>%
+  group_by(level) %>%
+  summarise(corr = cor(purchase_count, total_amount))
+
+loyalty_summary <- customer_behavior %>%
+  group_by(level) %>%
+  summarise(
+    avg_purchase_count = mean(purchase_count),
+    avg_total_amount = mean(total_amount)
+  )
+loyalty_summary
+
+# 막대그래프로 평균 구매 건수와 구매 금액 비교
+library(tidyr)
+
+loyalty_summary_long <- loyalty_summary %>%
+  pivot_longer(cols = c(avg_purchase_count, avg_total_amount),
+               names_to = "metric", values_to = "value")
+
+ggplot(loyalty_summary_long, aes(x = level, y = value, fill = metric)) +
+  geom_col(position = "dodge") +
+  labs(title = "회원 등급별 고객 충성도 지표",
+       x = "회원 등급", y = "평균 값",
+       fill = "지표") +
+  theme_minimal()
