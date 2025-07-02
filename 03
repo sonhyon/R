@@ -1,0 +1,34 @@
+library(tibble)
+
+data <- tibble(
+  household_id = 1:10,
+  age_group = c("20대", "30대", "40대", "50대", "60대 이상",
+                "20대", "30대", "40대", "50대", "60대 이상"),
+  food = c(320, 450, 520, 480, 400, 310, 460, 530, 470, 390),
+  leisure = c(80, 120, 140, 130, 90, 70, 110, 150, 120, 100)
+)
+
+
+#Q. 2023년 전국 가구 소비지출 데이터를 활용하여, 가구주의 연령대별로 식료품비와 여가비의 평균 지출액을 비교하고, 연령대에 따른 소비 성향의 차이를 시각화하시오
+data %>%
+  group_by(age_group) %>%
+  summarise(mean_food = mean(food),
+            mean_leisure = mean(leisure))
+
+# 데이터 변환: 긴 형식으로
+summary <- data %>%
+  group_by(age_group) %>%
+  summarise(
+    mean_food = mean(food),
+    mean_leisure = mean(leisure)) %>%
+  pivot_longer(cols = starts_with("mean_"), names_to = "category", values_to = "amount") %>%
+  mutate(category = gsub("mean_", "", category))
+
+# 시각화
+ggplot(summary, aes(x = age_group, y = amount, fill = category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "연령대별 식료품비 및 여가비 평균 지출 비교",
+    x = "연령대", y = "평균 지출액(천원)", fill = "지출 항목"
+  ) +
+  theme_minimal()
