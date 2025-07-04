@@ -1,0 +1,22 @@
+data_ratio <- data %>%
+  group_by(age_group) %>%
+  summarise(
+    total_transport = sum(transport),
+    total_housing = sum(housing),
+    ratio = total_transport / total_housing,
+    .groups = "drop"
+  )
+
+mean_ratio <- sum(data$transport) / sum(data$housing)
+print(paste("전체 평균 교통비 비율:", round(mean_ratio, 3)))
+
+ggplot(data_ratio, aes(x = age_group, y = ratio, fill = age_group)) +
+  geom_col() +
+  labs(
+    title = "연령대별 교통비 비율 (주거비 대비)",
+    x = "연령대",
+    y = "교통비 / 주거비",
+    fill = "연령대"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
