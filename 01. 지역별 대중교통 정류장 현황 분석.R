@@ -54,6 +54,13 @@ leaflet(data = seoul) %>%
   addMarkers(lng = ~경도, lat = ~위도, popup = ~정류장명,
              clusterOptions = markerClusterOptions())
 
+#지역별 인구수
+pop_counts <- population %>%
+  group_by(시도명) %>%
+  summarise(total_pop = sum(계, na.rm = TRUE)) %>%
+  arrange(desc(total_pop))
+head(pop_counts)
+
 ###
 지역별 인구 수 데이터 불러오기
 인구 대비 정류장 밀도 분석 (회귀분석? 상관분석?)
