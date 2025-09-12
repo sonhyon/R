@@ -1,68 +1,77 @@
-#라이브러리 불러오기
-library(dplyr) ; library(ggplot2) ; library(leaflet)
+#*[인구 대비 정류장 밀도 분석]
 
+#*[라이브러리 불러오기]
+library(dplyr) ; library(ggplot2) ; library(leaflet) ; library(sf)
 
 #*[데이터 불러오기]
 getwd()
 trans_stops <- read.csv("./데이터/국토교통부_전국 버스정류장 위치정보_20241028.csv", fileEncoding = "euc-kr")
-head(trans_stops)
-
+population <- read.csv("./데이터/행정안전부_지역별(행정동) 성별 연령별 주민등록 인구수_20250731.csv", fileEncoding = "euc-kr")
+head(trans_stops, 5)
+head(population, 1)
 
 #*[데이터 전처리]
 sum(is.na(trans_stops))   # 데이터프레임 전체 NA 개수
+
+#서울 버스정류장
 trans_stops_clean <- na.omit(trans_stops)
 head(trans_stops_clean)
 
-#도시별 버스정류장 총수
-city_counts <- trans_stops_clean %>%
-  group_by(도시명) %>%
-  summarise(bus_stop_count = n()) %>%
-  arrange(desc(bus_stop_count))
-
-#도시별 버스정류장 총수_TOP10
-city_counts_10 <- trans_stops_clean %>%
-  group_by(도시명) %>%
-  summarise(bus_stop_count = n()) %>%
-  arrange(desc(bus_stop_count)) %>%
-  head(10)
-
-#서울 버스정류장
-seoul <- trans_stops_clean %>%
+seoul_bus_stop <- trans_stops_clean %>%
   filter(도시명 == '서울특별시')
-head(seoul)
+head(seoul_bus_stop)
 
-
-#*[시각화]
-#도시별 버스정류장 총수_TOP10
-ggplot(city_counts_10, aes(x = reorder(도시명, -bus_stop_count), y = bus_stop_count)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  theme_minimal() +
-  labs(x = "도시명", y = "정류장 수", title = "도시별 버스정류장 개수") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-#[서울 버스정류장 지도화]
-head(seoul[, c("위도", "경도")]) #위도(latitude)와 경도(longitude) 컬럼 이름이 정확한지 확인
-
-#지도 만들기
-leaflet(data = seoul) %>%
-  addTiles() %>%  # 기본 OpenStreetMap 타일
-  addMarkers(lng = ~경도, lat = ~위도, popup = ~정류장명)
-
-leaflet(data = seoul) %>%
-  addTiles() %>%
-  addMarkers(lng = ~경도, lat = ~위도, popup = ~정류장명,
-             clusterOptions = markerClusterOptions())
-
-#지역별 인구수
-pop_counts <- population %>%
-  group_by(시도명) %>%
+#서울 인구수
+seoul_pop <- population %>%
+  filter(시도명 == '서울특별시') %>%
+  group_by(시군구명) %>%
   summarise(total_pop = sum(계, na.rm = TRUE)) %>%
   arrange(desc(total_pop))
 head(pop_counts)
 
-###
-지역별 인구 수 데이터 불러오기
-인구 대비 정류장 밀도 분석 (회귀분석? 상관분석?)
-교통 취약 지역(인구는 많지만 정류장이 적은 지역) 찾기
+#*[시각화]
 
+#[서울 버스정류장 지도화]
+head(seoul_bus_stop[, c("위도", "경도")]) #위도(latitude)와 경도(longitude) 컬럼 이름이 정확한지 확인
+
+#지도 만들기
+leaflet(data = seoul_bus_stop) %>%
+  addTiles() %>%  # 기본 OpenStreetMap 타일
+  addMarkers(lng = ~경도, lat = ~위도, popup = ~정류장명)
+
+leaflet(data = seoul_bus_stop) %>%
+  addTiles() %>%
+  addMarkers(lng = ~경도, lat = ~위도, popup = ~정류장명,
+             clusterOptions = markerClusterOptions())
+
+#───────────────────────────────────────────────────────────────────
+#카카오 API를 활용한 좌표 -> 행정동
+
+
+#───────────────────────────────────────────────────────────────────
+#인구 대비 정류장 밀도 수 분석
+
+
+
+
+
+
+
+#───────────────────────────────────────────────────────────────────
+# 서울시 구 경계 불러오기
+gu_shp <- st_read("./sigun_grid/seoul.shp")  # 예: 서울시 구 shapefile
+
+
+# 정류장 데이터를 sf 객체로 변환
+bus_sf <- st_as_sf(seoul, coords = c("경도", "위도"), crs = 4326)
+
+#구별 정류장 수 계산
+bus_counts <- bus_sf %>%
+  group_by(시군구명) %>%
+  summarise(bus_stations = n(), .groups = "drop")
+
+#인구 대비 정류장 밀도 계산
+density_data <- pop_counts %>%
+  left_join(bus_counts, by = "시군구명") %>%
+  mutate(pop_per_station = total_pop / bus_stations) %>%
+  arrange(desc(pop_per_station))
