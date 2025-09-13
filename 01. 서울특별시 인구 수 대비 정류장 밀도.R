@@ -1,4 +1,4 @@
-#*[인구 대비 정류장 밀도 분석]
+#[인구 대비 정류장 밀도 분석]
 
 #*[라이브러리 불러오기]
 library(dplyr) ; library(ggplot2) ; library(leaflet) ; library(sf)
@@ -15,11 +15,33 @@ sum(is.na(trans_stops))   # 데이터프레임 전체 NA 개수
 
 #서울 버스정류장
 trans_stops_clean <- na.omit(trans_stops)
-head(trans_stops_clean)
-
 seoul_bus_stop <- trans_stops_clean %>%
   filter(도시명 == '서울특별시')
 head(seoul_bus_stop)
+
+install.packages("readr")
+library(readr)
+write_csv(seoul_bus_stop, "./데이터/seoul_bus_stop.csv")
+
+
+seoul_bus_rv <- read.csv("./데이터/서울버스정류장_리버스지오코딩.csv", fileEncoding = "utf-8")
+seoul_bus_rv <- seoul_bus_rv %>%
+  filter(도시명 == "서울특별시") %>%
+  select(X_ROAD_AD)
+
+library(stringr)
+
+# 정규식: '서울', '서울시', '서울특별시' 이후의 첫 토큰(공백/콤마/괄호 전까지)을 캡처
+m <- str_match(seoul_bus_rv$X_ROAD_AD, "서울(?:특별시|시)?\\s*([^\\s,\\(\\)]+)")
+
+# 그룹(1)이 우리가 원하는 행정구
+seoul_bus_rv$행정구 <- m[,2]
+
+seoul_bus_rv <- seoul_bus_rv %>%
+  filter(!is.na(행정구)) %>%
+  count(행정구, name = "정류장수") %>%
+  arrange(desc(정류장수))
+head(seoul_bus_rv) #***************************************
 
 #서울 인구수
 seoul_pop <- population %>%
@@ -27,7 +49,16 @@ seoul_pop <- population %>%
   group_by(시군구명) %>%
   summarise(total_pop = sum(계, na.rm = TRUE)) %>%
   arrange(desc(total_pop))
-head(pop_counts)
+head(seoul_pop) #**************************************
+
+
+
+
+
+seoul_data <- seoul_bus_rv %>%
+  left_join(seoul_pop, by = c("행정구" = "시군구명"))
+
+head(seoul_data)
 
 #*[시각화]
 
@@ -43,11 +74,6 @@ leaflet(data = seoul_bus_stop) %>%
   addTiles() %>%
   addMarkers(lng = ~경도, lat = ~위도, popup = ~정류장명,
              clusterOptions = markerClusterOptions())
-
-#───────────────────────────────────────────────────────────────────
-#카카오 API를 활용한 좌표 -> 행정동
-
-
 #───────────────────────────────────────────────────────────────────
 #인구 대비 정류장 밀도 수 분석
 
