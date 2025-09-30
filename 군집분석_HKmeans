@@ -1,1 +1,84 @@
+#───────────────────────────────────────────────────────────────
+# 0. 패키지 설치 및 로드
+#───────────────────────────────────────────────────────────────
+install.packages("factoextra")
+install.packages("cluster")
+install.packages("reshape2")
+install.packages("Rtsne")   # (t-SNE용)
 
+library(factoextra)  # hkmeans(), fviz_cluster 등
+library(cluster)     # silhouette 등
+library(reshape2)    # 데이터 변환(melt)
+library(ggplot2)     # 시각화
+library(Rtsne)       # t-SNE
+
+#───────────────────────────────────────────────────────────────
+# 1. 데이터 준비 (USArrests 예시)
+#───────────────────────────────────────────────────────────────
+data("USArrests")
+df <- na.omit(USArrests)   # 결측치 제거
+df <- scale(df)            # 표준화 (군집분석 필수!)
+head(df)
+
+#───────────────────────────────────────────────────────────────
+# 2. HKmeans 실행
+#───────────────────────────────────────────────────────────────
+set.seed(123)                  # 재현성 확보
+res.hk <- hkmeans(df, k = 4)   # 계층적 K-means (4개 군집)
+
+# 결과 확인
+print(res.hk)
+res.hk$size        # 군집별 크기
+res.hk$centers     # 군집 중심 (표준화 값)
+head(res.hk$cluster) # 각 데이터의 군집 할당
+
+# 기본 군집 시각화
+fviz_cluster(res.hk, data = df,
+             palette = "jco",
+             ggtheme = theme_minimal(),
+             main = "Hierarchical K-means Clustering")
+
+#───────────────────────────────────────────────────────────────
+# 3. 다양한 시각화 방법
+#───────────────────────────────────────────────────────────────
+
+## (1) 덴드로그램 (계층적 초기화 확인용)
+hc <- hclust(dist(df), method = "ward.D2")
+plot(hc, cex = 0.6, hang = -1)
+rect.hclust(hc, k = 4, border = 2:5)
+
+## (2) 실루엣 플롯 (군집의 분리도·응집도 평가)
+sil <- silhouette(res.hk$cluster, dist(df))
+plot(sil, col = 2:5, border = NA)
+
+## (3) PCA 기반 시각화 (변수 기여도까지 확인 가능)
+fviz_pca_biplot(prcomp(df), 
+                habillage = res.hk$cluster, 
+                addEllipses = TRUE, 
+                palette = "jco")
+
+## (4) 군집별 평균/중심값 막대그래프 (특징 비교)
+centers <- as.data.frame(res.hk$centers)
+centers$cluster <- factor(1:4)
+centers_long <- melt(centers, id.vars = "cluster")
+
+ggplot(centers_long, aes(x = variable, y = value, fill = cluster)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  labs(title = "Cluster Centers (standardized)")
+
+## (5) t-SNE 시각화 (고차원 데이터 구조 확인)
+tsne <- Rtsne(df, dims = 2, perplexity = 10, verbose = FALSE)
+plot(tsne$Y, col = res.hk$cluster, pch = 19,
+     main = "t-SNE visualization of HKmeans")
+
+#───────────────────────────────────────────────────────────────
+# 시각화별 의미
+#───────────────────────────────────────────────────────────────
+
+fviz_cluster → 기본 HKmeans 결과 (2차원 평면에서 군집 분포)
+덴드로그램 → 계층적 군집 초기화 구조 확인
+실루엣 플롯 → 군집의 타당성/품질 평가 (값이 1에 가까울수록 좋음)
+PCA biplot → 어떤 변수가 군집 구분에 기여했는지 확인 가능
+군집 중심 막대그래프 → 군집별 주요 특징 비교
+t-SNE → 고차원 데이터에서 군집의 실제 분포 구조 시각화
