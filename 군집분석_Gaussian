@@ -11,8 +11,7 @@ Gaussian Mixture Model (GMM) 군집분석 개념
 R
 #───────────────────────────────────────────────────────────────
 # 패키지 설치
-install.packages("mclust")
-library(mclust)
+library(mclust) ; library(ggplot2)
 
 # 예제 데이터: iris 데이터 (꽃받침, 꽃잎 길이와 너비 사용)
 data(iris)
@@ -31,6 +30,22 @@ head(gmm_model$classification)
 head(gmm_model$z)
 
 # 시각화
-plot(gmm_model, what = "classification")   # 군집 분포 확인
-plot(gmm_model, what = "BIC")              # 최적 군집 수 선택 과정 (BIC 기준)
+# 군집 분류 결과
+plot(gmm_model, what = "classification")
+# 각 군집의 밀도 추정 (변수별로)
+plot(gmm_model, what = "density")
+# BIC 기준으로 모델 선택 과정
+plot(gmm_model, what = "BIC")
+# 군집별 불확실성 (할당 확률이 애매한 점들 시각화)
+plot(gmm_model, what = "uncertainty")
+
+#ggplot 사용
+iris$cluster <- as.factor(gmm_model$classification)
+
+# 첫 두 변수 (Sepal.Length, Sepal.Width)만 시각화
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = cluster)) +
+  geom_point(size = 3, alpha = 0.7) +
+  labs(title = "Gaussian Mixture Clustering (GMM)",
+       x = "Sepal Length", y = "Sepal Width") +
+  theme_minimal()
 
