@@ -1,1 +1,8 @@
+#서울열린데이터(OpenAPI)
+reqURL <- "http://openapi.seoul.go.kr:8088"
+myKey <- "475170504f6f6f6e35366f4d6c5477"
+values <- c(myKey, "xml", "SeoulLibraryTimeInfo", 1, 5)
+
+req <- paste(c(reqURL, values), collapse = "/")
+req
 
