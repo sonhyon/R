@@ -5,10 +5,10 @@ reqURL <- "http://openapi.seoul.go.kr:8088"
 myKey <- "475170504f6f6f6e35366f4d6c5477"
 values <- c(myKey, "xml", "SeoulLibraryTimeInfo", 1, 5)
 ─────────────────────────────────────────────────────────────────
-#myKey: 서울시 공공데이터 API 개인 인증키입니다.
-#"xml": 응답 데이터를 XML 형태로 받겠다는 뜻입니다.
-#"SeoulLibraryTimeInfo": 호출할 서비스 이름(서울시 도서관 정보).
-#1, 5: 조회할 데이터의 시작 인덱스(1) 와 끝 인덱스(5) 를 의미합니다.
+myKey: 서울시 공공데이터 API 개인 인증키입니다.
+"xml": 응답 데이터를 XML 형태로 받겠다는 뜻입니다.
+"SeoulLibraryTimeInfo": 호출할 서비스 이름(서울시 도서관 정보).
+1, 5: 조회할 데이터의 시작 인덱스(1) 와 끝 인덱스(5) 를 의미합니다.
 → 즉, 첫 번째부터 다섯 번째 데이터까지 가져오라는 뜻입니다.
 ─────────────────────────────────────────────────────────────────
 
@@ -17,6 +17,12 @@ req
 
 respone <- xmlTreeParse(req, useInternalNodes = TRUE, encoding ="UTF-8")
 summary(respone)
+─────────────────────────────────────────────────────────────────
+xmlTreeParse() : URL에서 XML 파일을 읽어들여 R의 XML 트리 객체로 변환합니다.
+useInternalNodes = TRUE: XML 노드를 내부적으로 접근 가능하게 만듭니다.
+encoding = "UTF-8": 한글 데이터 깨짐 방지.
+summary(respone) : XML 객체 구조 요약을 출력합니다.
+─────────────────────────────────────────────────────────────────
 
 rn <- xmlRoot(respone)
 rn
